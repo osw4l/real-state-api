@@ -1,0 +1,17 @@
+# Django
+DJANGO_SECRET_KEY=secret
+DJANGO_DEBUG=true
+DJANGO_PRODUCTION=false
+
+POSTGRES_DB=db_backend
+POSTGRES_USER=db_backend
+PG_PORT=5432
+# dont touch PG_HOST
+PG_HOST=database
+POSTGRES_PASS=database
+
+# dont touch ALLOW_IP_RANGE
+ALLOW_IP_RANGE=0.0.0.0/0
+LANG=C.UTF-8
+LC_ALL=C.UTF-8
+
