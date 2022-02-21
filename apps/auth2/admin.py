@@ -12,9 +12,9 @@ class CompanyUserAdmin(admin.ModelAdmin):
     list_display = [
         'uuid',
         'username',
+        'get_full_name',
         'date_joined',
         'is_active',
-        'deleted'
     ]
     list_display_links = [
         'uuid'
@@ -36,3 +36,5 @@ class SpeedReportAdmin(LeafletGeoAdmin):
         models.JSONField: {'widget': JSONEditorWidget},
     }
 
+    def has_add_permission(self, request):
+        return False

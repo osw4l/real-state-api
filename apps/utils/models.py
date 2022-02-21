@@ -1,5 +1,4 @@
 import uuid
-from django.contrib.auth.models import UserManager
 from django.contrib.gis.db import models
 from .managers import ModelModelManager
 from django_lifecycle import LifecycleModel
@@ -26,9 +25,3 @@ class BaseModel(LifecycleModel):
             'deleted': self.deleted
         }
 
-
-class BaseModelUser(BaseModel):
-    objects = UserManager()
-
-    class Meta:
-        abstract = True

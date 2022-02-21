@@ -49,8 +49,8 @@ class CompanyUserSerializer(serializers.ModelSerializer):
 
 
 class LocationSerializer(serializers.Serializer):
-    longitude = serializers.CharField()
-    latitude = serializers.CharField()
+    longitude = serializers.FloatField()
+    latitude = serializers.FloatField()
 
     def update(self, instance, validated_data):
         pass

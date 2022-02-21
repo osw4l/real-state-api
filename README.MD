@@ -1,211 +1,401 @@
-  
-# Real State Api
+# Real State Tracker Backend
 
-![enter image description here](https://i.imgur.com/rsEw4yc.png)
+![](https://i.gifer.com/XkWR.gif)
 
-It is a beautiful **Django** image simple to configure, run and deploy, it was made with a lot of love and dedicated for humans who love django and simple things.
-
-this project contains the next libraries
-
- -  Python 3.8.10 
- - [Django==3.2](https://docs.djangoproject.com/en/4.0/releases/3.2/)    
- - [django-admin-interface](https://github.com/fabiocaccamo/django-admin-interface)    
- - [Channels](https://channels.readthedocs.io/en/stable/)    
- - [Celery](https://docs.celeryproject.org/en/stable/django/first-steps-with-django.html)    
- - [django-celery-beat](https://django-celery-beat.readthedocs.io/en/latest/)    
- - [django-celery-results](https://github.com/celery/django-celery-results)    
- - [django-cors-headers](https://github.com/adamchainz/django-cors-headers)    
- - [django-environ](https://django-environ.readthedocs.io/en/latest/)    
- - [django-extensions](https://github.com/django-extensions/django-extensions)    
- - [drf-yasg (Swagger)](https://github.com/axnsan12/drf-yasg)  
- - [djangorestframework](https://www.django-rest-framework.org/)    
- - [djangorestframework-gis](https://github.com/openwisp/django-rest-framework-gis)    
- - [django-leaflet](https://github.com/makinacorpus/django-leaflet)    
- - [django-map-widgets](https://github.com/erdem/django-map-widgets)    
- - psycopg2    
- - Redis    
- - Pillow    
- - django-storages    
- - boto    
- - botocore    
- - s3transfer    
-     
-and more pretty stuff like    
- - Docker compose    
- - [Daphne](https://docs.djangoproject.com/en/3.2/howto/deployment/asgi/daphne/)  
- - [UWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) (no gunicorn)  
- - [Postgis](https://postgis.net/) as Database  
- - [Geo Django](https://docs.djangoproject.com/en/3.2/ref/contrib/gis/)    
- - Leaflet and Google Maps    
- - Django Admin Themes
- - Celery Worker and Celery Beat    
- - Nginx with django static files support    
- - Static files working fine !    
- - AWS S3 Storage    
- - Natural structure, **like you weren't using docker**    
-- Production deploy steps [click here](https://gist.github.com/osw4l/cbfbfb3f7a7f42ab31fa5083b358f316)    
-
-**Django Rest Framework Swagger**
-
-the project contains its own auth backend with register, login and reset password
-
-![enter image description here](https://i.imgur.com/n2o2Fqo.png)
-
-Each endpoint contains its own serializer and swagger collection
-![enter image description here](https://i.imgur.com/Ynqm69w.png)
-
-![enter image description here](https://i.imgur.com/BlnGLVU.png)
-
-if you want to disable the register and the confirmation after register you have to go to setup in the admin
-
-[http://localhost:4500/admin/](http://localhost:4500/admin/)
-
-Go to main and then go to setup
-
-![enter image description here](https://i.imgur.com/Q70P0FB.png)
-
-![enter image description here](https://i.imgur.com/qbgi0dK.png)
-Now go to the detail
-
-I'll disabled the register for now
-
-![enter image description here](https://i.imgur.com/WQo5C4v.png)
-
-**Then if I try to register in the register endpoint this gonna be the result**
-
-![enter image description here](https://i.imgur.com/1H8Zxum.png)
-
-**Django Google Maps Widget**
-
-![enter image description here](https://cloud.githubusercontent.com/assets/1518272/26807500/ad0af4ea-4a4e-11e7-87d6-632f39e438f7.gif)
-
-**Django Leaflet**
-
-![enter image description here](https://camo.githubusercontent.com/4744043b6b90dbac1d548f4bc4fea4b82d2859867334a85b44ff119b42f905b0/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f3534363639322f313034383833362f37386236616439342d313039342d313165332d383664382d6333653838363236613331642e706e67)
-
-![enter image description here](https://fle.github.io/images/012-admin-widget.png)
-
-**Django Admin custom themes by** [django-admin-interface](https://github.com/fabiocaccamo/django-admin-interface)    
-
-![enter image description here](https://user-images.githubusercontent.com/1035294/35631521-64b0cab8-06a4-11e8-8f57-c04fdfbb7e8b.gif)
+## Introduction 
 
 
-**Custom Commands**
+This project focuses on tracking users based on longitude and latitude, 
+their displacement is determined taking into account the location and the time
+when the request it is received by the backend.
 
-![enter image description here](https://i.imgur.com/yHCPCTv.png)
- 
- to use the custom commands just give permissions
- 
- **Command to collect Statics**
-```bash
-chmod +x run_collect_static.sh
-```
 
- **Command to make migrations and migrate**
-```bash
-chmod +x run_migrate.sh
-```
 
- **Command to create super user**
- 
-```bash
-chmod +x run_create_user.sh
-```
+The tracking processor only receives the location through an 
+endpoint and through a celery task and does all the data.
 
- **Command to load django admin themes**
- 
-```bash
-chmod +x run_theme.sh
-```
 
-Simple and beautiful structure
 
-![enter image description here](https://i.imgur.com/rjlx88Y.png)    
-to run  the image follow the next instructions, just for local environment    
+I used redis to save the current location and paths, because I didn't want to
+write them to a field in the database that was going to be constantly 
+changing, so I left the location in memory and only used the database for 
+these particular tasks.
 
-## Create Environment file
-```bash
-cp env_template .env
-```
-## Build image
- 
-```bash
-docker-compose build
-```
-## Up image
-```bash
- docker-compose up -d
-```
-## Migrations
+ - Creating speed and route reports
+ - Creating and updating visits
+ - Search for properties near a user's location to start a visit automatically
 
-you can create migrations and migrate the new models changes using the custom commands
 
-**this command just run migrate command**
-```bash
- docker-compose exec backend python3 manage.py migrate
-```
+## Things I use Redis on
+ - To write and consult the parameters of speed limit and distance recording
+ - To save and update the user's location
+ - To create the routes and store the data related to distance, time and speed
 
-**this command just run makemigrations and migrate commands**
-```bash
-./run_migrate.sh
-```
+**Here is the evidence**
 
-## Restart Celery Beat
-```bash
- docker-compose restart beat
-``` 
-## Create Superuser 
+I'm using **Medis** as a **Redis GUI**.
 
- **command**
-```bash
-docker-compose exec backend python3 manage.py createsuperuser
-```
+![](https://i.imgur.com/GrFnJOX.png)
 
-**sh file**
-```bash
-./run_create_user.sh
-```
+![](https://i.imgur.com/oPzQTZ9.png)
 
-## collect statics
+![](https://i.imgur.com/yG3WHA0.png)
 
-this command just **works** in **local** doesn't work in production
-```bash
-docker-compose exec backend python3 manage.py collectstatic    
-```
+**Libraries that I use for this project**
+  - Django==3.2  
+  - celery==5.2.3  
+  - django-celery-results==2.2.0  
+  - django-environ==0.8.1
+  - djangorestframework==3.13.1  
+  - uWSGI==2.0.20  
+  - dj-static==0.0.6
+  - drf-extra-fields==3.2.1  
+  - drf-yasg==1.20.0  
+  - django-json-widget==1.1.1  
+  - django-leaflet==0.28.2  
+  - redis==4.1.4  
+  - psycopg2==2.9.3  
+  - django-lifecycle==0.9.6  
+  - django-cors-headers==3.11.0  
+  - geopy==1.20.0  
+  - postgis==1.0.4  
+  - djangorestframework-gis==0.18
 
-this command **works** in **local** and production
+Instructions to run the project locally
 
-**sh file**
-```bash
-./run_collect_static.sh
-```
+**Create the environment variables**
 
-## Load Django Admin Themes
+    cp env_tempate .env
 
-```bash
-./run_theme.sh
-```
+**Build the Docker image**
 
-## Pycharm Support first, we need to setup the common stuff to active the autocomplete adding the Django Support choosing the manage.py and settings.py files location.
-    
-![enter image description here](https://i.imgur.com/yxaLtUc.png)    
- now we need add the python interpreter what live inside the docker container to the project    
-    
-Go to preferences and to click in Interpreter then in Project Interpreter and press add    
-    
-![enter image description here](https://i.imgur.com/DwKsssx.png)    
- now, do click in Docker, select the image what contains the project name, then write python3 and press ok    
-    
-![enter image description here](https://i.imgur.com/pI86DZb.png)    
- press apply and ok, done!.    
-    
-![enter image description here](https://i.imgur.com/lmpULSQ.png)    
- now we have configured the interpreter what lives inside our Docker Container in our project    
-    
-Please, DON'T UPDATE THE DEPENDENCIES ! **unless necessary**    
+    docker-compose build
 
- if you wanna deploy this project in production, [go to here](https://gist.github.com/osw4l/cbfbfb3f7a7f42ab31fa5083b358f316)    
-    
-**Thanks for using my project, if you need something else, feel you free to contact me** **ioswxd@gmail.com**
+**Up the Docker containers**
 
-## Enjoy the project 🥳 🟡 🔵 💛 💙 💟
+    docker-compose up
+
+**Give execution permissions to setup.sh**
+
+    chmod +x setup.sh
+
+**Run setup.sh**
+
+    ./setup.sh
+
+**If you see these messages everything worked fine**
+
+![](https://i.imgur.com/lD6KQEZ.png)
+
+This file is in charge of the following tasks:
+
+- Load the static files of the libraries and the admin
+- Create a superuser that has access to the admin
+- Create a CompanyUser
+- Create 3 Properties in Bogotá Colombia, with address and location
+
+Once configured you can go to the admin and the root of the api
+
+Api: [http://localhost:4500/](http://localhost:4500/)
+
+Admin: 
+[http://localhost:4500/admin](http://localhost:4500/admin/)
+
+Admin credentials
+
+    username: admin
+    password: 123
+
+## API Description
+
+![enter image description here](https://i.imgur.com/Zs8IStL.png)
+
+![](https://i.imgur.com/TbASEqo.png)
+
+## Api Description
+
+The api has 4 endpoints
+
+- Login
+    - http://localhost:4500/auth/users/login/
+- Location **(requires auth)**
+    - http://localhost:4500/auth/users/location/
+- Routes
+    - http://localhost:4500/auth/users/{uuid}/routes/
+- Visits
+    - http://localhost:4500/auth/users/{uuid}/visits/
+
+
+### Login Description
+To log in with a non-administrator user we must use the following request body
+
+[POST]
+
+http://localhost:4500/auth/users/login
+
+    {"username": "test","password": "123"}
+
+I'll use postman for this example
+
+![](https://i.imgur.com/i76bEyt.png)
+
+My response will be 
+
+![](https://i.imgur.com/LKxjJ4w.png)
+
+I'll save the token in my postman environment to get the token when i want
+
+![](https://i.imgur.com/dxofDSo.png)
+
+### Location Description
+In this endpoint all the magic of the business happens, the mobile application only has to send the authentication token in the headers and the location whenever it changes, the backend will do the rest by itself
+
+[POST]
+
+http://localhost:4500/auth/users/location/
+
+I'll use postman again for this example and i'll try sending these locations
+
+But we have to setup the headers just like this to authenticate the user in each Http request
+
+![](https://i.imgur.com/QC5Ab42.png)
+
+Now, we are ready to send requests
+
+![](https://i.imgur.com/pHZvkwk.png)
+
+A successful response will look like this
+
+![](https://i.imgur.com/5y3IGpQ.png)
+
+Point 1
+
+    {"latitude": 4.769813, "longitude": -74.027205}
+
+Point 2
+
+    {"latitude": 4.769909, "longitude": -74.030969}
+
+Point 3
+
+    {"latitude": 4.769433, "longitude": -74.031006}
+
+Point 4
+
+    {"latitude": 4.769902, "longitude": -74.032555}
+
+Point 5
+
+    {"latitude": 4.768804, "longitude": -74.032576}
+
+This is the last location (point 5)
+![](https://i.imgur.com/HDJgn2P.png)
+
+And in this point we have a property
+![](https://i.imgur.com/5OyLYRP.png)
+
+That means we have a new visit created, but is not finished yet
+![](https://i.imgur.com/zxugWRL.png)
+
+
+To close the current visit we have to go out of the radio of the current property
+
+Let's out of the radius of the current property
+
+[POST]
+
+http://localhost:4500/auth/users/location/
+
+    {"latitude": 4.769902, "longitude": -74.032566}
+
+![](https://i.imgur.com/TaZ5upj.png)
+
+And now we have finished our visit
+![](https://i.imgur.com/hi9GeXQ.png)
+
+
+And now we have a new speed report
+![](https://i.imgur.com/y5G7KvZ.png)
+
+Let's see the detail of the last speed report
+![](https://i.imgur.com/Mtyvw6m.png)
+![](https://i.imgur.com/sxgxiOq.png)
+![](https://i.imgur.com/QEfoZap.png)
+![](https://i.imgur.com/C0qAvY9.png)
+
+Now, we can know the routes of our user, the speeding, and more 
+
+### Routes Description
+In this endpoint we will get the routes for a day for a user
+with these params with speed and speed
+
+ - user_uuid (we have to go to the admin and copy the uuid)
+ - date in this format (YYYY-MM-DD) example (2022-02-21)
+
+Let's copy uuid in company users
+
+![](https://i.imgur.com/fAbdZhu.png)
+
+If you want, you can go to this endpoint and add the params
+
+[POST]
+
+http://localhost:4500/auth/users/{uuid}/routes/
+
+[BODY]
+
+    {"date": "2022-02-20"}
+
+Let's back to the Browseable Api, and add the current date and user_uuid
+
+![](https://i.imgur.com/kjL9HP4.png)
+
+
+this will be the result
+
+    {
+    "current_page": 1,
+    "pages": 1,
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "uuid": "adf2b241-5c48-4490-b8d7-056ae490e256",
+            "location_start": {
+                "latitude": 4.769813,
+                "longitude": -74.027205
+            },
+            "location_end": {
+                "latitude": 4.768804,
+                "longitude": -74.032576
+            },
+            "speed_avg": 137,
+            "max_speed": 375,
+            "route": {
+                "type": "LineString",
+                "coordinates": [
+                    [
+                        -74.027205,
+                        4.769813
+                    ],
+                    [
+                        -74.030969,
+                        4.769909
+                    ],
+                    [
+                        -74.031006,
+                        4.769433
+                    ],
+                    [
+                        -74.032555,
+                        4.769902
+                    ],
+                    [
+                        -74.032576,
+                        4.768804
+                    ]
+                ]
+            },
+            "speeding": [
+                {
+                    "speed": 375.93,
+                    "current_limit": 50,
+                    "difference": 325.93
+                },
+                {
+                    "speed": 63.36,
+                    "current_limit": 50,
+                    "difference": 13.36
+                },
+                {
+                    "speed": 161.55,
+                    "current_limit": 50,
+                    "difference": 111.55
+                },
+                {
+                    "speed": 87.44,
+                    "current_limit": 50,
+                    "difference": 37.44
+                }
+            ]
+        }
+    ]
+
+Now, we can see the route and the points with speed 
+
+This endpoint already includes pagination
+
+### Visits Description
+In this endpoint we will get the routes for a day for a user
+with these params with speed and speed
+
+ - user_uuid (we have to go to the admin and copy the uuid)
+ - date in this format (YYYY-MM-DD) example (2022-02-21)
+
+Let's copy uuid in company users
+
+![](https://i.imgur.com/fAbdZhu.png)
+
+If you want, you can go to this endpoint and add the params
+
+[POST]
+
+http://localhost:4500/auth/users/{uuid}/visits/
+
+[BODY]
+
+    {"date": "2022-02-20"}
+
+Let's back to the Browseable Api, and add the current date and user_uuid
+
+![](https://i.imgur.com/H2K6MCW.png)
+
+
+This will be the result
+
+    {
+      "current_page": 1,
+      "pages": 1,
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+          {
+              "uuid": "3b179ebe-c97e-44cd-a773-030e007a7c63",
+              "property": {
+                  "uuid": "3f2385df-8a06-4ba0-9203-f645715e5390",
+                  "address": "Cra 11A # 191A - 52",
+                  "location": {
+                      "latitude": 4.768804,
+                      "longitude": -74.032578
+                  }
+              },
+              "user": {
+                  "uuid": "bda8d006-a050-4fc3-bf8f-bd1ee8bbfff8",
+                  "username": "test",
+                  "full_name": "oswaldo rodriguez"
+              },
+              "end_at": "20/02/2022 19:20:50",
+              "created_at": "20/02/2022 19:07:23",
+              "duration": "13 Minutes approx"
+          }
+      ] }
+
+
+### Speed Limit Setup
+
+Go back to setup in the admin page
+![](https://i.imgur.com/BrdBNcr.png)
+
+Here we can setup the speed limit and de displacement
+
+Displacement it is to know which points to save depending on the 
+difference in space, if I want to register the location every 50 meters, 
+this is important because when there is heavy traffic and we have 
+the location every 2 meters we will obtain many points and fill the 
+database with information that we are not going to use then it is 
+important to know the routes and travel times more than having all the 
+points of a route without any meaning.
+
+

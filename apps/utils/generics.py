@@ -5,9 +5,9 @@ class RealStateGenericViewSet(viewsets.GenericViewSet):
     custom_serializer_class = None
 
     def get_custom_serializer(self, *args, **kwargs):
-        serializer_class = self.get_custom_serializer_class()
+        custom_serializer_class = self.get_custom_serializer_class()
         kwargs.setdefault('context', self.get_serializer_context())
-        return serializer_class(*args, **kwargs)
+        return custom_serializer_class(*args, **kwargs)
 
     def get_custom_serializer_class(self):
         assert self.custom_serializer_class is not None, (

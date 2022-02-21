@@ -3,12 +3,12 @@ DJANGO_SECRET_KEY=secret
 DJANGO_DEBUG=true
 DJANGO_PRODUCTION=false
 
-POSTGRES_DB=db_backend
-POSTGRES_USER=db_backend
+POSTGRES_DB=real_state_db
+POSTGRES_USER=real_state_db_user
 PG_PORT=5432
 # dont touch PG_HOST
 PG_HOST=database
-POSTGRES_PASS=database
+POSTGRES_PASS=real_state_db_user_password
 
 # dont touch ALLOW_IP_RANGE
 ALLOW_IP_RANGE=0.0.0.0/0

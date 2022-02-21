@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     # third party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_gis',
     'leaflet',
     'django_celery_results',
     'django_json_widget',
