@@ -8,7 +8,7 @@ from rest_framework import permissions
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Osw4l Api V1",
+        title="Real State Tracker Api V1",
         default_version='v1',
         description="Project build by osw4l",
         contact=openapi.Contact(email="ioswxd@gmail.com"),

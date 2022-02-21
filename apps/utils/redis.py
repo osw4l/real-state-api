@@ -18,7 +18,7 @@ class RedisClient:
         data = self.client.get(key)
         try:
             data = json.loads(data)
-        except Exception as e:
+        except Exception:
             data = {}
         return data
 

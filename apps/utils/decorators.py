@@ -3,7 +3,7 @@ from django.db.models import QuerySet
 from rest_framework.response import Response
 
 
-def add_pagination(func):
+def action_paginated(func):
 
     @wraps(func)
     def inner(self, *args, **kwargs):
@@ -18,3 +18,4 @@ def add_pagination(func):
         serializer = self.get_custom_serializer(queryset, many=True)
         return Response(serializer.data)
     return inner
+

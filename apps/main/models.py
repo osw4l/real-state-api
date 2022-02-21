@@ -18,9 +18,9 @@ class Setup(BaseModel):
         ]
     )
     displacement = models.PositiveIntegerField(
-        default=50,
+        default=10,
         validators=[
-            MinValueValidator(50),
+            MinValueValidator(10),
             MaxValueValidator(500)
         ]
     )

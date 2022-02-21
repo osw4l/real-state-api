@@ -35,8 +35,10 @@ class VisitAdmin(LeafletGeoAdmin):
     list_display = [
         'uuid',
         'user',
+        'property',
         'created_at',
-        'end_at'
+        'end_at',
+        'duration'
     ]
     search_fields = [
         'user__first_name',

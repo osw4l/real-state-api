@@ -1,4 +1,3 @@
-from datetime import datetime
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -7,6 +6,9 @@ from apps.main.serializers import VisitSerializer
 from apps.utils.pagination import CustomPagination
 from apps.main.models import Visit
 from apps.utils.serializers import DateFilterSerializer
+from apps.utils.decorators import action_paginated
+from apps.utils.generics import RealStateGenericViewSet
+from apps.utils.shortcuts import get_datetime_now_str
 from . import tasks
 from .models import CompanyUser, SpeedReport
 from .serializers import (
@@ -15,13 +17,11 @@ from .serializers import (
     LocationSerializer,
     SpeedReportSerializer
 )
-from apps.utils.decorators import add_pagination
-from apps.utils.generics import RealStateGenericViewSet
 
 
 class CompanyUserAuthViewSet(RealStateGenericViewSet):
     serializer_class = CompanyUserSerializer
-    queryset = CompanyUser.objects.filter(deleted=False)
+    queryset = CompanyUser.objects.all()
     permission_classes = [
         IsAuthenticated,
         IsCompanyUser,
@@ -48,14 +48,14 @@ class CompanyUserAuthViewSet(RealStateGenericViewSet):
     def location(self, request):
         self.serializer_class(data=request.data).is_valid(raise_exception=True)
 
-        time = datetime.now().strftime('%d/%m/%y %H:%M:%S')
+        time = get_datetime_now_str()
         tasks.location_processor.delay(self.request.user.id, request.data, time)
 
         return Response({
             "location_sent": True
         })
 
-    @add_pagination
+    @action_paginated
     @action(detail=True,
             methods=['POST'],
             permission_classes=[AllowAny],
@@ -69,7 +69,7 @@ class CompanyUserAuthViewSet(RealStateGenericViewSet):
             date=date_serializer.data.get('date')
         )
 
-    @add_pagination
+    @action_paginated
     @action(detail=True,
             methods=['POST'],
             permission_classes=[AllowAny],
@@ -78,7 +78,6 @@ class CompanyUserAuthViewSet(RealStateGenericViewSet):
     def routes(self, request, uuid=None):
         date_serializer = self.serializer_class(data=request.data)
         date_serializer.is_valid(raise_exception=True)
-
         return SpeedReport.filter_by_date_and_user(
             user_uuid=uuid,
             date=date_serializer.data.get('date')
